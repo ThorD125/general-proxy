@@ -5,7 +5,13 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"log"
+	"strings"
 )
+
+type device struct {
+	name        string
+	description string
+}
 
 func main() {
 	devices, err := pcap.FindAllDevs()
@@ -15,7 +21,9 @@ func main() {
 
 	// Print information about each network device
 	for _, device := range devices {
-		log.Printf("Name: %s\nDescription: %s\n", device.Name, device.Description)
+		if !(strings.Contains(device.Description, "VMnet")) && !(strings.Contains(device.Description, "Virtual")) {
+			log.Printf("Name: %s\nDescription: %s\n", device.Name, device.Description)
+		}
 	}
 
 	handle, err := pcap.OpenLive("\\Device\\NPF_Loopback", 65536, true, pcap.BlockForever)
