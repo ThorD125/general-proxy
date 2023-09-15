@@ -11,7 +11,8 @@
     const eventSource = new EventSource("/updatePackets");
 
     eventSource.onmessage = function(event) {
-        contentElement.textContent = event.data + "\n" + contentElement.textContent;
+        console.log(event.data);
+        //  contentElement.textContent = event.data + "\n" + contentElement.textContent;
     };
 </script>
 </body>
