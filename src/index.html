@@ -4,6 +4,8 @@
     <title>atitle</title>
 </head>
 <body>
+<button id="toggleButton">Toggle Capture</button>
+
 <div id="content"></div>
 <script>
     const contentElement = document.getElementById("content");
@@ -14,6 +16,20 @@
         console.log(event.data);
         //  contentElement.textContent = event.data + "\n" + contentElement.textContent;
     };
+
+
+    let isCapturing = true;
+
+    document.getElementById('toggleButton').addEventListener('click', function() {
+        fetch(isCapturing ? '/pause' : '/resume')
+            .then(response => {
+                if (response.ok) {
+                    isCapturing = !isCapturing;
+                    document.getElementById('toggleButton').innerText = isCapturing ? 'Pause Capture' : 'Resume Capture';
+                }
+            })
+            .catch(error => console.error('Error toggling capture:', error));
+    });
 </script>
 </body>
 </html>
