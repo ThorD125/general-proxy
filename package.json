@@ -1,0 +1,11 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/ThorD125/template",
+  "author": "ThorD125",
+  "license": "GNU GENERAL PUBLIC LICENSE",
+  "scripts": {
+    "save": "git add . && git commit -m f && git push && git status"
+  }
+}
