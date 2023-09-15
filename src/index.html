@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Real-Time Counter</title>
+</head>
+<body>
+<h1>Counter: <span id="counter">0</span></h1>
+<script>
+    const counterElement = document.getElementById("counter");
+
+    const eventSource = new EventSource("/sse");
+
+    eventSource.onmessage = function(event) {
+        counterElement.textContent = event.data;
+    };
+</script>
+</body>
+</html>
