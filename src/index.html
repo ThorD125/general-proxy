@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Real-Time Counter</title>
+    <title>atitle</title>
 </head>
 <body>
-<h1>Counter: <span id="counter">0</span></h1>
+<div id="content"></div>
 <script>
-    const counterElement = document.getElementById("counter");
+    const contentElement = document.getElementById("content");
 
-    const eventSource = new EventSource("/sse");
+    const eventSource = new EventSource("/updatePackets");
 
     eventSource.onmessage = function(event) {
-        counterElement.textContent = event.data;
+        contentElement.textContent = event.data + "\n" + contentElement.textContent;
     };
 </script>
 </body>

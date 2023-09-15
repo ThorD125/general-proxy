@@ -2,30 +2,61 @@ package main
 
 import (
 	"fmt"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
+	"log"
 	"net/http"
+	"strings"
 	"sync"
-	"time"
 )
 
 var (
-	counter   int
+	counter   gopacket.Packet
 	counterMu sync.Mutex
-	clients   []chan int
+	clients   []chan gopacket.Packet
 	clientMu  sync.Mutex
 )
 
 func main() {
+
+	// Find all available network devices
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Print information about each network device
+	for _, device := range devices {
+		// Filter out virtual network devices
+		if !(strings.Contains(device.Description, "VMnet")) && !(strings.Contains(device.Description, "Virtual")) {
+			log.Printf("Name: %s\nDescription: %s\n", device.Name, device.Description)
+		}
+	}
+
+	// Open a network interface for capturing packets
+	handle, err := pcap.OpenLive("\\Device\\NPF_Loopback", 65536, true, pcap.BlockForever)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = handle.SetBPFFilter("tcp") // Set a BPF filter to capture only TCP packets
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Create a packet source from the handle
+	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./src/index.html") // Specify the correct path to your HTML file
 	})
 
-	http.HandleFunc("/sse", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/updatePackets", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/event-stream")
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Connection", "keep-alive")
 
 		// Create a channel for this client
-		clientChan := make(chan int)
+		clientChan := make(chan gopacket.Packet)
 
 		// Register the client
 		clientMu.Lock()
@@ -54,31 +85,34 @@ func main() {
 			}
 		}
 	})
-
 	go func() {
-		for {
+
+		// Process incoming packets
+		for packet := range packetSource.Packets() {
+			// Process the outgoing packet here
+			fmt.Println(packet)
+			updateClients(packet)
+		}
+	}()
+	http.ListenAndServe(":8888", nil)
+
+	/*	for {
 			time.Sleep(1 * time.Second)
 			incrementCounter()
 			updateClients(counter)
 		}
-	}()
+	*/
 
-	http.ListenAndServe(":8888", nil)
+	defer handle.Close()
 }
 
-func incrementCounter() {
-	counterMu.Lock()
-	defer counterMu.Unlock()
-	counter++
-}
-
-func getCounter() int {
+func getCounter() gopacket.Packet {
 	counterMu.Lock()
 	defer counterMu.Unlock()
 	return counter
 }
 
-func updateClients(counter int) {
+func updateClients(counter gopacket.Packet) {
 	clientMu.Lock()
 	defer clientMu.Unlock()
 	for _, clientChan := range clients {
@@ -86,7 +120,7 @@ func updateClients(counter int) {
 	}
 }
 
-func removeClient(clientChan chan int) {
+func removeClient(clientChan chan gopacket.Packet) {
 	clientMu.Lock()
 	defer clientMu.Unlock()
 	for i, c := range clients {
