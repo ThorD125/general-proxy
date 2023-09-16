@@ -20,6 +20,7 @@ var (
 	clientMu    sync.Mutex
 	isPaused    bool
 	pauseResume sync.Mutex
+	handle      *pcap.Handle
 )
 
 func main() {
@@ -48,7 +49,10 @@ func getHostIPAddress() string {
 	return ""
 }
 func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
-
+	fmt.Println(handle)
+	if handle != nil {
+		handle.Close()
+	}
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
@@ -71,13 +75,17 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//hostIP := getHostIPAddress()
-	hostIP := "192.168.1.105"
-	fmt.Println(hostIP)
-	err = handle.SetBPFFilter("tcp and (src host " + hostIP + " or dst host " + hostIP + ")")
+	err = handle.SetBPFFilter("tcp and port 80") // Capture only HTTP traffic (port 80)
 	if err != nil {
 		log.Fatal(err)
 	}
+	//hostIP := getHostIPAddress()
+	//hostIP := "192.168.1.105"
+	//fmt.Println(hostIP)
+	//err = handle.SetBPFFilter("tcp and (src host " + hostIP + " or dst host " + hostIP + ")")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	//err = handle.SetBPFFilter("tcp")
 	//err = handle.SetBPFFilter("udp")
 	//if err != nil {
@@ -88,7 +96,6 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Device selected: "+device)
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-
 	go func() {
 		for packet := range packetSource.Packets() {
 			if !isPaused {
