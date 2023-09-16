@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -188,11 +186,12 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 					payloadLayer := packet.ApplicationLayer()
 					if payloadLayer != nil {
 						payloadLayer, _ := payloadLayer.(*gopacket.Payload)
+						fmt.Println("\n\n\n")
 						fmt.Println("Payload:", payloadLayer.Payload())
 
-						var payload Payload
-						fmt.Println("Payload:", binary.Read(bytes.NewReader(payloadLayer.Payload()), binary.LittleEndian, &payload))
-
+						for _, value := range payloadLayer.Payload() {
+							fmt.Printf("%c", value)
+						}
 					}
 				}
 			}
