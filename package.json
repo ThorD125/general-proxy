@@ -6,6 +6,7 @@
   "author": "ThorD125",
   "license": "GNU GENERAL PUBLIC LICENSE",
   "scripts": {
-    "save": "git add . && git commit -m f && git push && git status"
+    "save": "git add . && git commit -m f && git push && git status",
+    "update": "git fetch origin && git checkout development && git pull"
   }
 }
