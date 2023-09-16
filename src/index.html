@@ -7,7 +7,7 @@
 
 
 <select id="selectDevice">
-    <option value=" ">Select</option>
+    <option value=" ">Select Capture Device</option>
     {{range .Buttons}}
     <option value="{{.}}">{{.}}</option>
     {{ end }}
@@ -15,6 +15,9 @@
 
 
 <button id="toggleButton">Resume Capture</button>
+
+
+
 
 <div id="content"></div>
 <script>

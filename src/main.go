@@ -7,7 +7,9 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
+	"strings"
 	"sync"
 )
 
@@ -31,7 +33,20 @@ func main() {
 	http.ListenAndServe(":8888", nil)
 
 }
-
+func getHostIPAddress() string {
+	// Get the host's IP address
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+			return ipnet.IP.String()
+		}
+	}
+	log.Fatal("Unable to determine host's IP address")
+	return ""
+}
 func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -56,10 +71,18 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = handle.SetBPFFilter("tcp")
+	//hostIP := getHostIPAddress()
+	hostIP := "192.168.1.105"
+	fmt.Println(hostIP)
+	err = handle.SetBPFFilter("tcp and (src host " + hostIP + " or dst host " + hostIP + ")")
 	if err != nil {
 		log.Fatal(err)
 	}
+	//err = handle.SetBPFFilter("tcp")
+	//err = handle.SetBPFFilter("udp")
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	// Send a response to the client
 	fmt.Fprintln(w, "Device selected: "+device)
@@ -157,7 +180,10 @@ func selectAbleDevices() []string {
 	var deviceNames []string
 
 	for _, device := range devices {
-		deviceNames = append(deviceNames, device.Name)
+		if !(strings.Contains(device.Description, "VMnet")) && !(strings.Contains(device.Description, "Virtual")) && !(strings.Contains(device.Description, "Bluetooth")) && !(strings.Contains(device.Description, "Miniport")) {
+			fmt.Println(device.Description)
+			deviceNames = append(deviceNames, device.Name)
+		}
 	}
 
 	return deviceNames
