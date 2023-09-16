@@ -58,7 +58,6 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
 		return
 	}
-
 	defer r.Body.Close()
 
 	device := string("")
@@ -67,18 +66,24 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 
 		device += asciiChar
 	}
+
+	if body == nil {
+		device = "\\Device\\NPF_Loopback"
+	}
 	//test := "\\Device\\NPF_Loopback"
 	//fmt.Println(test)
 
 	fmt.Println(device)
+
 	handle, err := pcap.OpenLive(device, 65536, true, pcap.BlockForever)
+
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = handle.SetBPFFilter("tcp and port 80") // Capture only HTTP traffic (port 80)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//err = handle.SetBPFFilter("tcp and port 80") // Capture only HTTP traffic (port 80)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 	//hostIP := getHostIPAddress()
 	//hostIP := "192.168.1.105"
 	//fmt.Println(hostIP)
@@ -96,10 +101,11 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Device selected: "+device)
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+
 	go func() {
 		for packet := range packetSource.Packets() {
 			if !isPaused {
-				//fmt.Println(packet)
+				fmt.Println(packet)
 				updateClients(packet)
 			}
 		}
