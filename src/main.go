@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
+	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
 	"sync"
 )
 
@@ -20,7 +21,38 @@ var (
 )
 
 func main() {
-	handle, err := pcap.OpenLive(selectDevice(), 65536, true, pcap.BlockForever)
+
+	http.HandleFunc("/", handleSummonWebpage)
+	http.HandleFunc("/updatePackets", handleUpdatePackets)
+	http.HandleFunc("/pause", handlePause)
+	http.HandleFunc("/resume", handleResume)
+	http.HandleFunc("/selectDevice", handleSelectDevice)
+
+	http.ListenAndServe(":8888", nil)
+
+}
+
+func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+
+	defer r.Body.Close()
+
+	device := string("")
+	for _, value := range body {
+		asciiChar := fmt.Sprintf("%c", value)
+
+		device += asciiChar
+	}
+	//test := "\\Device\\NPF_Loopback"
+	//fmt.Println(test)
+
+	fmt.Println(device)
+	handle, err := pcap.OpenLive(device, 65536, true, pcap.BlockForever)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,11 +63,6 @@ func main() {
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
-	http.HandleFunc("/", handleSummonWebpage)
-	http.HandleFunc("/updatePackets", handleUpdatePackets)
-	http.HandleFunc("/pause", handlePause)
-	http.HandleFunc("/resume", handleResume)
-
 	go func() {
 		for packet := range packetSource.Packets() {
 			if !isPaused {
@@ -44,7 +71,6 @@ func main() {
 			}
 		}
 	}()
-	http.ListenAndServe(":8888", nil)
 
 	defer handle.Close()
 }
@@ -100,21 +126,38 @@ func handleUpdatePackets(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSummonWebpage(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "./src/index.html")
+	tmpl, err := template.ParseFiles("./src/index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	data := struct {
+		Buttons []string
+	}{
+		Buttons: selectAbleDevices(),
+	}
+
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
-func selectDevice() string {
+func selectAbleDevices() []string {
 	devices, err := pcap.FindAllDevs()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	var deviceNames []string
+
 	for _, device := range devices {
-		if !(strings.Contains(device.Description, "VMnet")) && !(strings.Contains(device.Description, "Virtual")) {
-			log.Printf("Name: %s\nDescription: %s\n", device.Name, device.Description)
-		}
+		deviceNames = append(deviceNames, device.Name)
 	}
-	return "\\Device\\NPF_Loopback"
+
+	return deviceNames
 }
 
 func handlePause(w http.ResponseWriter, r *http.Request) {

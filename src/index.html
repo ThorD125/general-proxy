@@ -4,6 +4,16 @@
     <title>atitle</title>
 </head>
 <body>
+
+
+<select id="selectDevice">
+    <option value=" ">Select</option>
+    {{range .Buttons}}
+    <option value="{{.}}">{{.}}</option>
+    {{ end }}
+</select>
+
+
 <button id="toggleButton">Toggle Capture</button>
 
 <div id="content"></div>
@@ -31,6 +41,16 @@
             })
             .catch(error => console.error('Error toggling capture:', error));
     });
+
+    document.getElementById('selectDevice').addEventListener('change', function() {
+        fetch("/selectDevice", {
+            method: "POST",
+            body: document.getElementById('selectDevice').value,
+        })
+            .catch(error => console.error('Error toggling capture:', error));
+    });
+
+
 </script>
 </body>
 </html>
