@@ -49,12 +49,6 @@ func main() {
 	defer handle.Close()
 }
 
-func getCounter() gopacket.Packet {
-	counterMu.Lock()
-	defer counterMu.Unlock()
-	return counter
-}
-
 func updateClients(counter gopacket.Packet) {
 	clientMu.Lock()
 	defer clientMu.Unlock()
