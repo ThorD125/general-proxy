@@ -14,7 +14,7 @@
 </select>
 
 
-<button id="toggleButton">Toggle Capture</button>
+<button id="toggleButton">Resume Capture</button>
 
 <div id="content"></div>
 <script>
@@ -23,13 +23,13 @@
     const eventSource = new EventSource("/updatePackets");
 
     eventSource.onmessage = function(event) {
-        // console.log(event.data);
+        console.log(event.data);
         // contentElement.textContent = event.data + "\n" + contentElement.textContent;
         contentElement.textContent = event.data;
     };
 
 
-    let isCapturing = true;
+    let isCapturing = false;
 
     document.getElementById('toggleButton').addEventListener('click', function() {
         fetch(isCapturing ? '/pause' : '/resume')
@@ -44,10 +44,16 @@
 
     document.getElementById('selectDevice').addEventListener('change', function() {
         fetch("/selectDevice", {
-            method: "POST",
+            method: "POST",  // Change this to POST
             body: document.getElementById('selectDevice').value,
         })
-            .catch(error => console.error('Error toggling capture:', error));
+            .then(response => {
+                if (response.ok) {
+                    isCapturing = true;  // Pause capture when changing devices
+                    document.getElementById('toggleButton').innerText = 'Pause Capture';
+                }
+            })
+            .catch(error => console.error('Error selecting device:', error));
     });
 
 

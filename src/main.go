@@ -61,6 +61,9 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 
+	// Send a response to the client
+	fmt.Fprintln(w, "Device selected: "+device)
+
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
 	go func() {
@@ -72,7 +75,7 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	defer handle.Close()
+	//defer handle.Close()
 }
 
 func updateClients(counter gopacket.Packet) {
