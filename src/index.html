@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>atitle</title>
+    <title>ghostly's packet editor</title>
 </head>
 <body>
 
@@ -45,7 +45,10 @@
             .catch(error => console.error('Error toggling capture:', error));
     });
 
-    document.getElementById('selectDevice').addEventListener('change', function() {
+    document.getElementById('selectDevice').addEventListener('change', changeDevice);
+
+
+    function changeDevice() {
         fetch("/selectDevice", {
             method: "POST",  // Change this to POST
             body: document.getElementById('selectDevice').value,
@@ -57,8 +60,15 @@
                 }
             })
             .catch(error => console.error('Error selecting device:', error));
-    });
+    }
 
+
+
+    document.querySelector("select").value = document.querySelectorAll("option")[1].value;
+    changeDevice();
+    setTimeout(function() {
+        document.getElementById('toggleButton').click();
+    }, 1000);
 
 </script>
 </body>
