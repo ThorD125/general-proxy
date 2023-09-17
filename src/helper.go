@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/shirou/gopsutil/net"
 	"log"
@@ -56,7 +55,7 @@ func numbersToASCII(numbers []int) string {
 	return asciiString
 }
 
-func removeClient(clientChan chan gopacket.Packet) {
+func removeClient(clientChan chan map[string][][]byte) {
 	clientMu.Lock()
 	defer clientMu.Unlock()
 	for i, c := range clients {
@@ -99,4 +98,11 @@ func getProcessRunningStatus(pid int) string {
 		exeName = strings.Trim(strings.Split(lines[1], ",")[0], "\"")
 	}
 	return exeName
+}
+func updateClients(packetsing map[string][][]byte) {
+	clientMu.Lock()
+	defer clientMu.Unlock()
+	for _, clientChan := range clients {
+		clientChan <- packetsing
+	}
 }

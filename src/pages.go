@@ -35,7 +35,7 @@ func handleUpdatePackets(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 
-	clientChan := make(chan gopacket.Packet)
+	clientChan := make(chan map[string][][]byte)
 
 	clientMu.Lock()
 	clients = append(clients, clientChan)
@@ -94,22 +94,6 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//err = handle.SetBPFFilter("tcp and port 80") // Capture only HTTP traffic (port 80)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//err = handle.SetBPFFilter("tcp and (src host " + hostIP + " or dst host " + hostIP + ")")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//err = handle.SetBPFFilter("tcp")
-	//err = handle.SetBPFFilter("udp")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-
-	// Send a response to the client
-	//fmt.Fprintln(w, "Device selected: "+device)
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
