@@ -61,7 +61,7 @@ func handleUpdatePackets(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(handle)
+	//fmt.Println(handle)
 	if handle != nil {
 		handle.Close()
 	}
@@ -87,6 +87,8 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(device)
 
+	ipAddrOfInterface = getInterfaceFromDeviceName(device).Addresses[0].IP.String()
+	fmt.Println(ipAddrOfInterface)
 	handle, err := pcap.OpenLive(device, 65536, true, pcap.BlockForever)
 
 	if err != nil {
@@ -96,9 +98,6 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-	//hostIP := getHostIPAddress()
-	//hostIP := "192.168.1.105"
-	//fmt.Println(hostIP)
 	//err = handle.SetBPFFilter("tcp and (src host " + hostIP + " or dst host " + hostIP + ")")
 	//if err != nil {
 	//	log.Fatal(err)
@@ -110,11 +109,25 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	// Send a response to the client
-	fmt.Fprintln(w, "Device selected: "+device)
+	//fmt.Fprintln(w, "Device selected: "+device)
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
 	showpackets(packetSource)
 
 	//defer handle.Close()
+}
+
+func getInterfaceFromDeviceName(device string) pcap.Interface {
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, devicelist := range devices {
+		if devicelist.Name == device {
+			return devicelist
+		}
+	}
+	return pcap.Interface{}
 }

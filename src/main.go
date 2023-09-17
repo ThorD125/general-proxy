@@ -20,6 +20,8 @@ var (
 	ethLayer layers.Ethernet
 	ipLayer  layers.IPv4
 	tcpLayer layers.TCP
+
+	ipAddrOfInterface string
 )
 
 func main() {

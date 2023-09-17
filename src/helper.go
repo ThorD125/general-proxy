@@ -5,7 +5,6 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"log"
-	"net"
 	"net/http"
 	"strings"
 )
@@ -20,7 +19,8 @@ func selectAbleDevices() []string {
 
 	for _, device := range devices {
 		if !(strings.Contains(device.Description, "VMnet")) && !(strings.Contains(device.Description, "Virtual")) && !(strings.Contains(device.Description, "Bluetooth")) && !(strings.Contains(device.Description, "Miniport")) {
-			fmt.Println(device.Description)
+			//fmt.Println(device.Description)
+			//fmt.Println(device.Addresses[0].IP.String())
 			deviceNames = append(deviceNames, device.Name)
 		}
 	}
@@ -54,14 +54,6 @@ func numbersToASCII(numbers []int) string {
 	return asciiString
 }
 
-func updateClients(counter gopacket.Packet) {
-	clientMu.Lock()
-	defer clientMu.Unlock()
-	for _, clientChan := range clients {
-		clientChan <- counter
-	}
-}
-
 func removeClient(clientChan chan gopacket.Packet) {
 	clientMu.Lock()
 	defer clientMu.Unlock()
@@ -72,19 +64,4 @@ func removeClient(clientChan chan gopacket.Packet) {
 			break
 		}
 	}
-}
-
-func getHostIPAddress() string {
-	// Get the host's IP address
-	addrs, err := net.InterfaceAddrs()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, addr := range addrs {
-		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
-			return ipnet.IP.String()
-		}
-	}
-	log.Fatal("Unable to determine host's IP address")
-	return ""
 }
