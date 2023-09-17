@@ -5,6 +5,7 @@ import (
 	"gioui.org/widget"
 	"log"
 	"os"
+	"strconv"
 
 	"gioui.org/app"
 	"gioui.org/io/system"
@@ -26,13 +27,27 @@ func uii() {
 	}()
 	app.Main()
 }
-
 func run(w *app.Window) error {
 	th := material.NewTheme()
 	var ops op.Ops
 
-	var resumeCapture widget.Clickable
-	resumeText := "Resume Capture"
+	var buttons []widget.Clickable
+	buttonLabels := []string{
+		"Button 1",
+		"Button 2",
+		"Button 3",
+		"Button 4",
+		"Button 5",
+		"Button 6",
+		"Button 7",
+		"Button 8",
+		"Button 9",
+		"Button 10",
+	}
+
+	for range buttonLabels {
+		buttons = append(buttons, widget.Clickable{})
+	}
 
 	for {
 		e := <-w.Events()
@@ -42,37 +57,32 @@ func run(w *app.Window) error {
 		case system.FrameEvent:
 			gtx := layout.NewContext(&ops, e)
 
-			for resumeCapture.Clicked() {
-				// This code will be executed when the button is clicked.
-				if resumeText == "Resume Capture" {
-					resumeText = "Pause Capture"
-					handleSelectDevice("\\Device\\NPF_Loopback")
-					handleResume()
-				} else {
-					resumeText = "Resume Capture"
-					handlePause()
+			var buttonLayouts []layout.Widget
+			for i := range buttonLabels {
+				i := i // Create a local variable to capture the current value of i
+				for buttons[i].Clicked() {
+					fmt.Println("Button", i+1, "clicked")
 				}
-			}
 
-			var abutton = layout.Rigid(
-				func(gtx layout.Context) layout.Dimensions {
-					btn := material.Button(th, &resumeCapture, resumeText)
-
+				buttonLayouts = append(buttonLayouts, func(gtx layout.Context) layout.Dimensions {
+					btn := material.Button(th, &buttons[i], strconv.Itoa(i+1))
 					return btn.Layout(gtx)
-				},
-			)
+				})
+			}
 
 			var flexer = layout.Flex{
 				Axis: layout.Vertical,
 			}
 
-			flexer.Layout(gtx, abutton)
+			// Convert buttonLayouts to []layout.FlexChild
+			var flexChildren []layout.FlexChild
+			for _, btnLayout := range buttonLayouts {
+				flexChildren = append(flexChildren, layout.Rigid(btnLayout))
+			}
+
+			flexer.Layout(gtx, flexChildren...)
 
 			e.Frame(gtx.Ops)
 		}
 	}
-}
-func handleButtonClick() {
-	// Put your code here to handle the button click event.
-	fmt.Println("Button clicked!")
 }
