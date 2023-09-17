@@ -54,17 +54,19 @@ func run(w *app.Window) error {
 				}
 			}
 
-			layout.Flex{
-				Axis: layout.Vertical,
-			}.Layout(gtx,
-				layout.Rigid(
-					func(gtx layout.Context) layout.Dimensions {
-						btn := material.Button(th, &resumeCapture, resumeText)
+			var abutton = layout.Rigid(
+				func(gtx layout.Context) layout.Dimensions {
+					btn := material.Button(th, &resumeCapture, resumeText)
 
-						return btn.Layout(gtx)
-					},
-				),
+					return btn.Layout(gtx)
+				},
 			)
+
+			var flexer = layout.Flex{
+				Axis: layout.Vertical,
+			}
+
+			flexer.Layout(gtx, abutton)
 
 			e.Frame(gtx.Ops)
 		}
