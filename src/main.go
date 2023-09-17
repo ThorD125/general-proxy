@@ -21,7 +21,7 @@ var (
 	ipLayer  layers.IPv4
 	tcpLayer layers.TCP
 
-	ipAddrOfInterface string
+	ipv4AddrOfInterface string
 )
 
 func main() {

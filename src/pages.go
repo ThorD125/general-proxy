@@ -87,8 +87,8 @@ func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(device)
 
-	ipAddrOfInterface = getInterfaceFromDeviceName(device).Addresses[0].IP.String()
-	fmt.Println(ipAddrOfInterface)
+	ipv4AddrOfInterface = getInterfaceFromDeviceName(device).Addresses[0].IP.String()
+	fmt.Println(ipv4AddrOfInterface)
 	handle, err := pcap.OpenLive(device, 65536, true, pcap.BlockForever)
 
 	if err != nil {
