@@ -2,16 +2,14 @@ package main
 
 import (
 	"fmt"
-	"gioui.org/widget"
-	"log"
-	"os"
-	"strconv"
-
 	"gioui.org/app"
 	"gioui.org/io/system"
 	"gioui.org/layout"
 	"gioui.org/op"
+	"gioui.org/widget"
 	"gioui.org/widget/material"
+	"log"
+	"os"
 )
 
 func uii() {
@@ -32,18 +30,7 @@ func run(w *app.Window) error {
 	var ops op.Ops
 
 	var buttons []widget.Clickable
-	buttonLabels := []string{
-		"Button 1",
-		"Button 2",
-		"Button 3",
-		"Button 4",
-		"Button 5",
-		"Button 6",
-		"Button 7",
-		"Button 8",
-		"Button 9",
-		"Button 10",
-	}
+	buttonLabels := selectAbleDevices()
 
 	for range buttonLabels {
 		buttons = append(buttons, widget.Clickable{})
@@ -59,13 +46,13 @@ func run(w *app.Window) error {
 
 			var buttonLayouts []layout.Widget
 			for i := range buttonLabels {
-				i := i // Create a local variable to capture the current value of i
-				for buttons[i].Clicked() {
-					fmt.Println("Button", i+1, "clicked")
+				eweee := i // Create a local variable to capture the current value of eweee
+				for buttons[eweee].Clicked() {
+					fmt.Println("clicked", buttonLabels[eweee])
 				}
 
 				buttonLayouts = append(buttonLayouts, func(gtx layout.Context) layout.Dimensions {
-					btn := material.Button(th, &buttons[i], strconv.Itoa(i+1))
+					btn := material.Button(th, &buttons[eweee], buttonLabels[eweee])
 					return btn.Layout(gtx)
 				})
 			}
