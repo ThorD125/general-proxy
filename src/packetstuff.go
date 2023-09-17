@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/shirou/gopsutil/net"
+	"os/exec"
+	"strings"
 )
 
 type appPackets struct {
@@ -58,10 +61,11 @@ func showpackets(packetSource *gopacket.PacketSource) {
 						}
 					}
 				}
+
+				appName := getAppName(appPort)
 				fmt.Println("myIp: ", ipv4AddrOfInterface)
 				fmt.Println("otherIp: ", otherIp)
 				fmt.Println("appPort: ", appPort)
-				appName := getAppName(appPort)
 				fmt.Println("appName ", appName)
 
 				isNotInList := true
@@ -96,6 +100,35 @@ func showpackets(packetSource *gopacket.PacketSource) {
 }
 
 func getAppName(port int) string {
-	fmt.Println("port: ", port)
-	return "test"
+	//fmt.Println("port: ", port)
+
+	connections, err := net.Connections("all")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return ""
+	}
+	pid := int32(0)
+	for _, conn := range connections {
+		if int(conn.Laddr.Port) == port || int(conn.Raddr.Port) == port {
+			pid = conn.Pid
+			break
+		}
+	}
+	return getProcessRunningStatus(int(pid))
+}
+
+func getProcessRunningStatus(pid int) string {
+	cmd := exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid), "/FO", "CSV")
+
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+
+	lines := strings.Split(string(output), "\n")
+	exeName := ""
+	if len(lines) >= 2 {
+		exeName = strings.Trim(strings.Split(lines[1], ",")[0], "\"")
+	}
+	return exeName
 }
