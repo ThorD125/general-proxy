@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
+	"github.com/shirou/gopsutil/net"
 	"log"
 	"net/http"
+	"os/exec"
 	"strings"
 )
 
@@ -64,4 +66,37 @@ func removeClient(clientChan chan gopacket.Packet) {
 			break
 		}
 	}
+}
+
+func getAppName(port int) int {
+
+	connections, err := net.Connections("all")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return 0
+	}
+	pid := int32(0)
+	for _, conn := range connections {
+		if int(conn.Laddr.Port) == port || int(conn.Raddr.Port) == port {
+			pid = conn.Pid
+			break
+		}
+	}
+	return int(pid)
+}
+
+func getProcessRunningStatus(pid int) string {
+	cmd := exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid), "/FO", "CSV")
+
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+
+	lines := strings.Split(string(output), "\n")
+	exeName := ""
+	if len(lines) >= 2 {
+		exeName = strings.Trim(strings.Split(lines[1], ",")[0], "\"")
+	}
+	return exeName
 }

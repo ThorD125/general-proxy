@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
-	"github.com/shirou/gopsutil/net"
-	"os/exec"
-	"strings"
 )
 
 type appPackets struct {
@@ -17,7 +14,7 @@ type appPackets struct {
 }
 
 func showpackets(packetSource *gopacket.PacketSource) {
-	appsPakketList := []appPackets{}
+	var appsPakketList = []appPackets{}
 	go func() {
 		for packet := range packetSource.Packets() {
 			if !isPaused {
@@ -62,11 +59,11 @@ func showpackets(packetSource *gopacket.PacketSource) {
 					}
 				}
 
-				appName := getAppName(appPort)
-				fmt.Println("myIp: ", ipv4AddrOfInterface)
-				fmt.Println("otherIp: ", otherIp)
-				fmt.Println("appPort: ", appPort)
-				fmt.Println("appName ", appName)
+				appName := getProcessRunningStatus(getAppName(appPort))
+				//fmt.Println("myIp: ", ipv4AddrOfInterface)
+				//fmt.Println("otherIp: ", otherIp)
+				//fmt.Println("appPort: ", appPort)
+				//fmt.Println("appName ", appName)
 
 				isNotInList := true
 				for _, appPakket := range appsPakketList {
@@ -85,50 +82,21 @@ func showpackets(packetSource *gopacket.PacketSource) {
 					})
 				} else {
 					for _, appPakket := range appsPakketList {
-						if appPakket.Name == appName && appPakket.IP == otherIp && appPakket.Port == appPort {
+						if appPakket.Name == appName {
+							//if appPakket.Name == appName && appPakket.IP == otherIp && appPakket.Port == appPort {
+
 							appPakket.packetList = append(appPakket.packetList, packet)
+							//fmt.Println("appPakket: ", appPakket.Name, ",", appPakket.IP, ":", appPakket.Port, ",", len(appPakket.packetList))
 							break
 						}
 					}
 				}
-
-				fmt.Println("appsPakketList: ", len(appsPakketList))
+				fmt.Println("somanypackets: ", len(appsPakketList))
+				for _, appPakket := range appsPakketList {
+					fmt.Println("appPakket: ", appPakket.Name, ",", appPakket.IP, ":", appPakket.Port, ",", len(appPakket.packetList))
+				}
 			}
 		}
 	}()
 
-}
-
-func getAppName(port int) string {
-	//fmt.Println("port: ", port)
-
-	connections, err := net.Connections("all")
-	if err != nil {
-		fmt.Println("Error:", err)
-		return ""
-	}
-	pid := int32(0)
-	for _, conn := range connections {
-		if int(conn.Laddr.Port) == port || int(conn.Raddr.Port) == port {
-			pid = conn.Pid
-			break
-		}
-	}
-	return getProcessRunningStatus(int(pid))
-}
-
-func getProcessRunningStatus(pid int) string {
-	cmd := exec.Command("tasklist", "/FI", fmt.Sprintf("PID eq %d", pid), "/FO", "CSV")
-
-	output, err := cmd.Output()
-	if err != nil {
-		return ""
-	}
-
-	lines := strings.Split(string(output), "\n")
-	exeName := ""
-	if len(lines) >= 2 {
-		exeName = strings.Trim(strings.Split(lines[1], ",")[0], "\"")
-	}
-	return exeName
 }
