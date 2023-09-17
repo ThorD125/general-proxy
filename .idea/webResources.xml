@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebResourcesPaths">
+    <contentEntries>
+      <entry url="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc">
+        <entryData>
+          <resourceRoots>
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/_example" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/data" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gdk" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gdkpixbuf" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gio" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/glib" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gtk" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gtkgl" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gtksourceview" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/gtkspell" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/pango" />
+            <path value="file://$USER_HOME$/go/pkg/mod/github.com/mattn/go-gtk@v0.0.0-20230419095350-e099c1bf7abc/tools" />
+          </resourceRoots>
+        </entryData>
+      </entry>
+    </contentEntries>
+  </component>
+</project>

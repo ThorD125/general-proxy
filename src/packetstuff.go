@@ -60,7 +60,7 @@ func showpackets(packetSource *gopacket.PacketSource) {
 				appName := getProcessRunningStatus(getAppName(appPort))
 				appsPakketList[appName] = append(appsPakketList[appName], packet.Data())
 
-				//fmt.Println(packet)
+				fmt.Println(packet)
 				updateClients(appsPakketList)
 
 				fmt.Println("----------------------------------------")
