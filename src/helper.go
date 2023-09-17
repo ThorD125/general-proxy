@@ -5,7 +5,6 @@ import (
 	"github.com/google/gopacket/pcap"
 	"github.com/shirou/gopsutil/net"
 	"log"
-	"net/http"
 	"os/exec"
 	"strings"
 )
@@ -29,18 +28,18 @@ func selectAbleDevices() []string {
 	return deviceNames
 }
 
-func handlePause(w http.ResponseWriter, r *http.Request) {
+func handlePause() {
 	pauseResume.Lock()
 	isPaused = true
 	pauseResume.Unlock()
-	fmt.Fprintln(w, "Capture Paused")
+	fmt.Println("Capture Paused")
 }
 
-func handleResume(w http.ResponseWriter, r *http.Request) {
+func handleResume() {
 	pauseResume.Lock()
 	isPaused = false
 	pauseResume.Unlock()
-	fmt.Fprintln(w, "Capture Resumed")
+	fmt.Println("Capture Resumed")
 }
 
 func numbersToASCII(numbers []int) string {

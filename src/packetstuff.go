@@ -61,7 +61,7 @@ func showpackets(packetSource *gopacket.PacketSource) {
 				appsPakketList[appName] = append(appsPakketList[appName], packet.Data())
 
 				fmt.Println(packet)
-				updateClients(appsPakketList)
+				//updateClients(appsPakketList)
 
 				fmt.Println("----------------------------------------")
 				fmt.Println("somanypackets: ", len(appsPakketList))
