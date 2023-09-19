@@ -32,6 +32,9 @@ func run(w *app.Window) error {
 	var buttons []widget.Clickable
 	buttonLabels := selectAbleDevices()
 
+	resumeButton := widget.Clickable{}
+	captureButtonLabel := "Resume Capture"
+
 	for range buttonLabels {
 		buttons = append(buttons, widget.Clickable{})
 	}
@@ -60,6 +63,23 @@ func run(w *app.Window) error {
 			var flexer = layout.Flex{
 				Axis: layout.Vertical,
 			}
+
+			if resumeButton.Clicked() {
+				fmt.Println("clicked", captureButtonLabel)
+				isPaused = !isPaused
+				if isPaused {
+					captureButtonLabel = "Resume Capture"
+				} else {
+					captureButtonLabel = "Pause Capture"
+				}
+
+				handleSelectDevice("\\Device\\NPF_Loopback")
+			}
+
+			buttonLayouts = append(buttonLayouts, func(gtx layout.Context) layout.Dimensions {
+				btn := material.Button(th, &resumeButton, captureButtonLabel)
+				return btn.Layout(gtx)
+			})
 
 			// Convert buttonLayouts to []layout.FlexChild
 			var flexChildren []layout.FlexChild

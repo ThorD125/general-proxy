@@ -69,6 +69,8 @@ func showpackets(packetSource *gopacket.PacketSource) {
 					fmt.Println(appName, ": ", len(Pakket))
 				}
 
+			} else {
+				break
 			}
 		}
 	}()

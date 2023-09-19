@@ -60,30 +60,6 @@ func handleUpdatePackets(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleSelectDevice(device string) {
-	//func handleSelectDevice(w http.ResponseWriter, r *http.Request) {
-	//fmt.Println(handle)
-	//if handle != nil {
-	//	handle.Close()
-	//}
-	//body, err := ioutil.ReadAll(r.Body)
-	//if err != nil {
-	//	http.Error(w, "Failed to read request body", http.StatusInternalServerError)
-	//	return
-	//}
-	//defer r.Body.Close()
-	//
-	//device := string("")
-	//for _, value := range body {
-	//	asciiChar := fmt.Sprintf("%c", value)
-	//
-	//	device += asciiChar
-	//}
-	//
-	//if body == nil {
-	//	device = "\\Device\\NPF_Loopback"
-	//}
-	//fmt.Println(test)
-
 	fmt.Println(device)
 
 	ipv4AddrOfInterface = getInterfaceFromDeviceName(device).Addresses[0].IP.String()
@@ -97,8 +73,6 @@ func handleSelectDevice(device string) {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 
 	showpackets(packetSource)
-
-	//defer handle.Close()
 }
 
 func getInterfaceFromDeviceName(device string) pcap.Interface {
