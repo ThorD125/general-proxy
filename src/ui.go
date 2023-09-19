@@ -9,6 +9,7 @@ import (
 	"gioui.org/widget"
 	"gioui.org/widget/material"
 	"github.com/google/gopacket"
+	"image/color"
 	"log"
 	"os"
 )
@@ -26,11 +27,15 @@ func uii() {
 	}()
 	app.Main()
 }
+
+var selectedDevice string
+
 func run(w *app.Window) error {
 	th := material.NewTheme()
 	var ops op.Ops
 
 	var buttons []widget.Clickable
+	var buttonColors []color.NRGBA
 	buttonLabels := selectAbleDevices()
 
 	resumeButton := widget.Clickable{}
@@ -38,6 +43,7 @@ func run(w *app.Window) error {
 
 	for range buttonLabels {
 		buttons = append(buttons, widget.Clickable{})
+		buttonColors = append(buttonColors, color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00})
 	}
 
 	for {
@@ -52,11 +58,17 @@ func run(w *app.Window) error {
 			for i := range buttonLabels {
 				eweee := i // Create a local variable to capture the current value of eweee
 				for buttons[eweee].Clicked() {
-					fmt.Println("clicked", buttonLabels[eweee])
+					//fmt.Println("clicked", buttonLabels[eweee])
+					for itbutton := range buttonColors {
+						buttonColors[itbutton] = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0x00}
+					}
+					selectedDevice = buttonLabels[eweee]
+					buttonColors[eweee] = color.NRGBA{R: 0x00, G: 0x00, B: 0x00, A: 0xFF}
 				}
 
 				buttonLayouts = append(buttonLayouts, func(gtx layout.Context) layout.Dimensions {
 					btn := material.Button(th, &buttons[eweee], buttonLabels[eweee])
+					btn.Background = buttonColors[eweee]
 					return btn.Layout(gtx)
 				})
 			}
@@ -74,7 +86,7 @@ func run(w *app.Window) error {
 					captureButtonLabel = "Pause Capture"
 				}
 
-				handleSelectDevice("\\Device\\NPF_Loopback")
+				handleSelectDevice(selectedDevice)
 			}
 
 			buttonLayouts = append(buttonLayouts, func(gtx layout.Context) layout.Dimensions {

@@ -9,6 +9,6 @@ func main() {
 	//http.HandleFunc("/selectDevice", handleSelectDevice)
 	//
 	//http.ListenAndServe(":8888", nil)
-
+	
 	uii()
 }
