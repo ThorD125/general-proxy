@@ -14,9 +14,7 @@ type appPackets struct {
 }
 
 func showpackets(packetSource *gopacket.PacketSource) {
-	//var appsPakketList = []appPackets{}
-	//appsPakketList := make(map[string][]gopacket.Packet)
-	appsPakketList := make(map[string][][]byte)
+	appsPakketList := make(map[string][]gopacket.Packet)
 	go func() {
 		for packet := range packetSource.Packets() {
 			if !isPaused {
@@ -58,17 +56,9 @@ func showpackets(packetSource *gopacket.PacketSource) {
 				}
 
 				appName := getProcessRunningStatus(getAppName(appPort))
-				appsPakketList[appName] = append(appsPakketList[appName], packet.Data())
+				appsPakketList[appName] = append(appsPakketList[appName], packet)
 
-				fmt.Println(packet)
-				//updateClients(appsPakketList)
-
-				fmt.Println("----------------------------------------")
-				fmt.Println("somanypackets: ", len(appsPakketList))
-				for appName, Pakket := range appsPakketList {
-					fmt.Println(appName, ": ", len(Pakket))
-				}
-
+				updatePackageView(appsPakketList)
 			} else {
 				break
 			}
