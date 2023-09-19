@@ -87,7 +87,7 @@ func run(w *app.Window) error {
 			for _, btnLayout := range buttonLayouts {
 				flexChildren = append(flexChildren, layout.Rigid(btnLayout))
 			}
-
+			clearDataStructureUI(gtx)
 			yourDataStructureUI(gtx, th)
 
 			flexer.Layout(gtx, flexChildren...)
@@ -96,16 +96,24 @@ func run(w *app.Window) error {
 		}
 	}
 }
+func clearDataStructureUI(gtx layout.Context) {
+	// Clear the container by removing all items from flexChildren
+	pakketStrFlex = nil
+
+	// Invalidate the context to trigger a redraw without the removed items
+	op.InvalidateOp{}.Add(gtx.Ops)
+}
+
+var pakketStrFlex []layout.FlexChild
 
 func yourDataStructureUI(gtx layout.Context, th *material.Theme) layout.Dimensions {
 	// Define the layout for displaying the data structure
 	// Iterate through the map and display keys as titles and packets underneath
-	var flexChildren []layout.FlexChild
 
 	for key, packets := range globalPacketsMap {
 		// Create a title label for each key
 		title := material.H6(th, key)
-		flexChildren = append(flexChildren, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+		pakketStrFlex = append(pakketStrFlex, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return title.Layout(gtx)
 		}))
 
@@ -115,11 +123,11 @@ func yourDataStructureUI(gtx layout.Context, th *material.Theme) layout.Dimensio
 		}
 		for _, packet := range packets {
 			packetLabel := material.Body1(th, fmt.Sprintf("Packet: %v", packet))
-			flexChildren = append(flexChildren, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			pakketStrFlex = append(pakketStrFlex, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				return packetLabel.Layout(gtx)
 			}))
 		}
-		flexChildren = append(flexChildren, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+		pakketStrFlex = append(pakketStrFlex, layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 			return packetList.Layout(gtx, len(packets), func(gtx layout.Context, index int) layout.Dimensions {
 				return layout.Flex{}.Layout(gtx)
 			})
@@ -129,7 +137,7 @@ func yourDataStructureUI(gtx layout.Context, th *material.Theme) layout.Dimensio
 	// Create a scrollable list of widgets
 	return layout.Flex{
 		Axis: layout.Vertical,
-	}.Layout(gtx, flexChildren...)
+	}.Layout(gtx, pakketStrFlex...)
 }
 
 var globalPacketsMap map[string][]gopacket.Packet
